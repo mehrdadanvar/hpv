@@ -1,0 +1,3 @@
+library(readr)
+data = read_csv(file = "hpv.csv",num_threads = 1)
+
