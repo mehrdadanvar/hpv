@@ -255,12 +255,12 @@ marry_know["Total"] = marry_know["score<=13"] + marry_know["score>13"]
 sums = marry_know.sum()
 marry_know.loc[len(marry_know)]= sums
 marry_know.index = ["Involved","Single","Total"]
-st.subheader(":blue[Corsstab Gender & Knowledge Score, Observed Values]")
+st.subheader(":blue[Corsstab Marital Status & Knowledge Score(Observed)]")
 st.table(marry_know)
 mksample.index = ["Involved","Single"]
 mksample.columns = ["score<=13","score>13"]
 mksample = mksample.reindex(columns=["score<=13","score>13"])
-st.subheader(":blue[Corsstab Gender & Knowledge Score, Expected Values]")
+st.subheader(":blue[Corsstab Marital Status & Knowledge Score (Expected)]")
 st.table(mksample)
 col1,col2,col3 = st.columns(3)
 col1.metric(label="Chi-Squre",value=str(round(mk_chi2,3)))
@@ -303,33 +303,51 @@ col1.metric(label="Chi-Squre",value=str(round(gb_chi2,3)))
 col2.metric("P_value",str(round(gb_p_value,3)))
 col3.metric("degrees of freedom",str(round(gb_dof,3)))
 st.divider()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+##########################################33
+st.subheader(":green[Hypothesis 5]")
+st.subheader("There Is No Difference Belivers and Non-Belivers With Regards to Missconceptions on HPV")
+def clean_child(row):
+    ans = row["d_children"]
+    category = ""
+    if ans == "0":
+        category = "NoChild"
+    else:
+        category = ">=1Child"
+    return category
+df["cleaned_child"] = df.apply(lambda x:clean_child(x),axis=1)
+chilbel = pd.crosstab(df['cleaned_child'], df['belief_score'])
+rb_chi2, rb_p_value, rb_dof, rb_expected = chi2_contingency(chilbel)
+rb_sample = pd.DataFrame(rb_expected)
+chilbel["Total"] = chilbel["score>9"] + chilbel["score<=9"]
+rbsums = chilbel.sum()
+chilbel.loc[len(chilbel)]= rbsums
+chilbel.index = ["NoChild",">=1Child","Total"]
+st.subheader(":blue[Corsstab Having Children & Belief Score (Observed)]")
+st.table(chilbel)
+rb_sample.index = ["NoChild",">=1Child"]
+rb_sample.columns = ["score>9","score<=9"]
+rb_sample = rb_sample.reindex(columns=["score<=9","score>9"])
+st.subheader(":blue[Corsstab Having Children & Belief Score (Expected)]")
+st.table(rb_sample)
+col1,col2,col3 = st.columns(3)
+col1.metric(label="Chi-Squre",value=str(round(rb_chi2,3)))
+col2.metric("P_value",str(round(rb_p_value,3)))
+col3.metric("degrees of freedom",str(round(rb_dof,3)))
+st.write(":green[There is enough evidence to reject the null hypothesis and support the alternative]")
+st.divider()
 #####################
-st.subheader(":green[Hypothesis 1] : There Is No Association Between Students' Knowledge and Thier Beliefs on HPV")
-st.subheader(":red[lets test that!]")
+st.subheader(":green[Hypothesis 6]")
+st.subheader("There Is No Association Between Students' Knowledge and Thier Beliefs on HPV")
 kb_fig,ax =plt.subplots()
-ax.scatter(df.k_finalscore,df.b_finalscore,color="red")
+ax.scatter(df.k_finalscore,df.b_finalscore,color="purple")
 ax.set(xlim=(2,26))
 plt.xlabel("x : Knowledge Score")
 plt.ylabel("y : Belief Score ")
 st.pyplot(kb_fig)
 #########################
 import scipy.stats as ss
-col1,col2,col3 =st.columns(3)
+col1,col2=st.columns(2)
 col1.metric(label="Pearson Correlation Coefficient",value= round(ss.pearsonr(df.k_finalscore,df.b_finalscore)[0],2))
 col2.metric("P_Value",value= round(ss.pearsonr(df.k_finalscore,df.b_finalscore)[1],4))
-st.write(ss.pearsonr(df.k_finalscore,df.b_finalscore)[0])
+st.write(":green[There is enough evidence to reject the null hypothesis and support the alternative]")
 st.divider()
