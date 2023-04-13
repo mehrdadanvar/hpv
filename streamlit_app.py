@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import altair as alt
+from scipy.stats import chi2_contingency
+
 know = pd.read_csv("./knowscore.csv")
 bel = pd.read_csv("./belscores.csv")
 main = pd.read_csv("./hpv/final2.csv")
@@ -168,7 +170,7 @@ st.pyplot(fig)
 st.write(df["b_finalscore"].describe())
 st.divider()
 #####################
-st.subheader(":green[Hypothesis] : There Is No Association Between Students' Knowledge and Thier Beliefs on HPV")
+st.subheader(":green[Hypothesis 1] : There Is No Association Between Students' Knowledge and Thier Beliefs on HPV")
 st.subheader(":red[lets test that!]")
 kb_fig,ax =plt.subplots()
 ax.scatter(df.k_finalscore,df.b_finalscore,color="red")
@@ -177,8 +179,42 @@ plt.xlabel("x : Knowledge Score")
 plt.ylabel("y : Belief Score ")
 st.pyplot(kb_fig)
 #########################
-a = 2
+import scipy.stats as ss
 col1,col2,col3 =st.columns(3)
-col1.metric(label="some text",value="5")
-col2.metric("col2","7")
+col1.metric(label="Pearson Correlation Coefficient",value= round(ss.pearsonr(df.k_finalscore,df.b_finalscore)[0],2))
+col2.metric("P_Value",value= round(ss.pearsonr(df.k_finalscore,df.b_finalscore)[1],4))
+st.write(ss.pearsonr(df.k_finalscore,df.b_finalscore)[0])
+st.divider()
+###########################
+st.header(":green[Hypothesis 2] There Is No Difference between Male and Female Students With Regards to Knowledge on HPV")
+def categorize_knowledge(row):
+    ans = row["k_finalscore"]
+    category = "0"
+    if ans > 11:
+        category = ">11"
+    else:
+        category="<=11"
+    return category
+
+df["knowledge_score"] = df.apply(lambda x:categorize_knowledge(x), axis=1)
+gender_know = pd.crosstab(df['d_gender'], df['knowledge_score'])
+chi2, p_value, dof, expected = chi2_contingency(gender_know)
+sample = pd.DataFrame(expected)
+gender_know["Total"] = gender_know["<=11"] + gender_know[">11"]
+sums = gender_know.sum()
+gender_know.loc[len(gender_know)]= sums
+gender_know.index = ["Female","Male","Total"]
+st.subheader(":blue[Corsstab Gender & Knowledge Score, Observed Values]")
+st.table(gender_know)
+sample.index = ["Female","Male"]
+sample.columns = ["Score>=11","Score<11"]
+chi2 = str(chi2)
+st.subheader(":blue[Corsstab Gender & Knowledge Score, Expected Values]")
+st.table(sample)
+col1,col2,col3 = st.columns(3)
+col1.metric(label="Chi-Squre",value=chi2)
+#####################################3
+st.header(":green[Hypothesis 2] There Is No Difference between Male and Female Students With Regards to Knowledge on HPV")
+
+
 
