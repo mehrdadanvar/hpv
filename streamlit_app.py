@@ -11,7 +11,9 @@ df = pd.merge(know,bel,how="left",on="d_time")
 print(df.shape)
 df = df.drop(index=range(4))
 print(df.shape)
-
+names = list(df.columns)
+df = df.drop(columns=df.loc[:, df.columns.str.endswith('_1')])
+print(df.columns)
 # new_names = [df[x][0] for x in df.columns]
 # df.columns = new_names
 #############################################
@@ -154,12 +156,10 @@ plt.xlabel("Knowledge Score")
 plt.ylabel("Number of Students")
 st.pyplot(fig)
 st.write(df["k_finalscore"].describe())
-
-
 st.divider()
 ################
 st.subheader("Distribution of the :blue[Belief Score]")
-st.write("Knowledge Score was calculated based on answers to :blue[18] qustions.")
+st.write("Belief Score was calculated based on answers to :blue[18] qustions.")
 belief = list(df["b_finalscore"])
 fig,ax = plt.subplots()
 ax.hist(belief,bins=10,color="cyan",edgecolor="white",alpha=0.8)
@@ -169,6 +169,154 @@ plt.ylabel("Number of Students")
 st.pyplot(fig)
 st.write(df["b_finalscore"].describe())
 st.divider()
+
+###########################
+st.header(":green[Hypothesis 1]")
+st.subheader("There Is No Difference between Male and Female Students With Regards to Knowledge on HPV")
+def categorize_knowledge(row):
+    ans = row["k_finalscore"]
+    category = "0"
+    if ans > 13:
+        category = "score>13"
+    else:
+        category="score<=13"
+    return category
+
+df["knowledge_score"] = df.apply(lambda x:categorize_knowledge(x), axis=1)
+gender_know = pd.crosstab(df['d_gender'], df['knowledge_score'])
+gk_chi2, gk_p_value, gk_dof, gk_expected = chi2_contingency(gender_know)
+gk_sample = pd.DataFrame(gk_expected)
+gender_know["Total"] = gender_know["score<=13"] + gender_know["score>13"]
+sums = gender_know.sum()
+gender_know.loc[len(gender_know)]= sums
+gender_know.index = ["Female","Male","Total"]
+st.subheader(":blue[Corsstab Gender & Knowledge Score (Observed)]")
+st.table(gender_know)
+gk_sample.index = ["Female","Male"]
+gk_sample.columns = ["score<=13","score>13"]
+gk_sample = gk_sample.reindex(columns= ["score<=13","score>13"])
+st.subheader(":blue[Corsstab Gender & Knowledge Score (Expected)]")
+st.table(gk_sample)
+col1,col2,col3 = st.columns(3)
+col1.metric(label="Chi-Squre",value=str(round(gk_chi2,3)))
+col2.metric("P_value",str(round(gk_p_value,3)))
+col3.metric("degrees of freedom",str(gk_dof))
+st.write(":red[There is not enough evidence to reject the hypothesis!]")
+st.divider()
+#####################################3
+st.header(":green[Hypothesis 2]")
+st.subheader("There Is No Difference between Low and High Income Students With Regards to Knowledge on HPV")
+def clean_income(row):
+    ans = row["d_income"]
+    category = ""
+    if ans =="$ 1000-1999 CAD" or ans=="< $ 1000 CAD":
+        category ="<$2000CAD"
+    else:
+        category = ">=$2000CAD"
+    return category
+df["clean_income"]= df.apply(lambda x:clean_income(x),axis=1)
+income_know = pd.crosstab(df["clean_income"],df["knowledge_score"])
+ki_chi2, ki_p_value, ki_dof, ki_expected = chi2_contingency(income_know)
+ki_sample = pd.DataFrame(ki_expected)
+income_know["Total"] = income_know["score<=13"] + income_know["score>13"]
+sums = income_know.sum()
+income_know.loc[len(income_know)]= sums
+income_know.index = ["Female","Male","Total"]
+st.subheader(":blue[Corsstab Income & Knowledge Score (Observed)]")
+st.table(income_know)
+ki_sample.index = ["<$2000CAD",">=$2000CAD"]
+ki_sample.columns = ["score<=13","score>13"]
+ki_sample = ki_sample.reindex(columns= ["score<=13","score>13"])
+st.subheader(":blue[Corsstab Income & Knowledge Score (Expected)]")
+st.table(ki_sample)
+col1,col2,col3 = st.columns(3)
+col1.metric(label="Chi-Squre",value=str(round(ki_chi2,3)))
+col2.metric("P_value",str(round(ki_p_value,3)))
+col3.metric("degrees of freedom",str(ki_dof))
+st.write(":red[There is not enough evidence to reject the hypothesis!]")
+st.divider()
+##########################
+st.header(":green[Hypothesis 3]")
+st.subheader("Students's Marital Status Is Not Linked to their Knowledge of HPV")
+def  clean_marry(row):
+    ans = row["d_marital"]
+    category = ""
+    if "Divorced" in ans or "Single" in ans:
+        category = "Single"
+    else:
+        category = "Involved"
+    return category
+df["clean_marr"] = df.apply(lambda x:clean_marry(x),axis=1)
+marry_know = pd.crosstab(df["clean_marr"],df["knowledge_score"])
+
+mk_chi2, mk_p_value, mk_dof, mk_expected = chi2_contingency(marry_know)
+mksample = pd.DataFrame(mk_expected)
+marry_know["Total"] = marry_know["score<=13"] + marry_know["score>13"]
+sums = marry_know.sum()
+marry_know.loc[len(marry_know)]= sums
+marry_know.index = ["Involved","Single","Total"]
+st.subheader(":blue[Corsstab Gender & Knowledge Score, Observed Values]")
+st.table(marry_know)
+mksample.index = ["Involved","Single"]
+mksample.columns = ["score<=13","score>13"]
+mksample = mksample.reindex(columns=["score<=13","score>13"])
+st.subheader(":blue[Corsstab Gender & Knowledge Score, Expected Values]")
+st.table(mksample)
+col1,col2,col3 = st.columns(3)
+col1.metric(label="Chi-Squre",value=str(round(mk_chi2,3)))
+col2.metric("P_value",str(round(mk_p_value,3)))
+col3.metric("degrees of freedom",str(round(mk_dof,3)))
+st.write(":green[There is enough evidence to reject the null hypothesis and support the alternative]")
+
+st.divider()
+#########################################################################
+st.header("Section 3")
+st.header("Hypothesis Testing on :purple[Belief Scores]")
+st.subheader(":green[Hypothesis 4]")
+st.subheader("There Is No Difference between Male and Female Students With Regards to Beliefs (Missconceptions) on HPV")
+def cat_bel(row):
+    ans = row["b_finalscore"]
+    category = "0"
+    if ans > 9:
+        category = "score>9"
+    else:
+        category="score<=9"
+    return category
+
+df["belief_score"] = df.apply(lambda x:cat_bel(x), axis=1)
+gender_bel = pd.crosstab(df['d_gender'], df['belief_score'])
+gb_chi2, gb_p_value, gb_dof, gb_expected = chi2_contingency(gender_bel)
+gb_sample = pd.DataFrame(gb_expected)
+gender_bel["Total"] = gender_bel["score>9"] + gender_bel["score<=9"]
+gbsums = gender_bel.sum()
+gender_bel.loc[len(gender_bel)]= gbsums
+gender_bel.index = ["Female","Male","Total"]
+st.subheader(":blue[Corsstab Gender & Belief Score, Observed Values]")
+st.table(gender_bel)
+gb_sample.index = ["Female","Male"]
+gb_sample.columns = ["score>9","score<=9"]
+gb_sample = gb_sample.reindex(columns=["score<=9","score>9"])
+st.subheader(":blue[Corsstab Gender & Belief Score, Expected Values]")
+st.table(gb_sample)
+col1,col2,col3 = st.columns(3)
+col1.metric(label="Chi-Squre",value=str(round(gb_chi2,3)))
+col2.metric("P_value",str(round(gb_p_value,3)))
+col3.metric("degrees of freedom",str(round(gb_dof,3)))
+st.divider()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #####################
 st.subheader(":green[Hypothesis 1] : There Is No Association Between Students' Knowledge and Thier Beliefs on HPV")
 st.subheader(":red[lets test that!]")
@@ -185,36 +333,3 @@ col1.metric(label="Pearson Correlation Coefficient",value= round(ss.pearsonr(df.
 col2.metric("P_Value",value= round(ss.pearsonr(df.k_finalscore,df.b_finalscore)[1],4))
 st.write(ss.pearsonr(df.k_finalscore,df.b_finalscore)[0])
 st.divider()
-###########################
-st.header(":green[Hypothesis 2] There Is No Difference between Male and Female Students With Regards to Knowledge on HPV")
-def categorize_knowledge(row):
-    ans = row["k_finalscore"]
-    category = "0"
-    if ans > 11:
-        category = ">11"
-    else:
-        category="<=11"
-    return category
-
-df["knowledge_score"] = df.apply(lambda x:categorize_knowledge(x), axis=1)
-gender_know = pd.crosstab(df['d_gender'], df['knowledge_score'])
-chi2, p_value, dof, expected = chi2_contingency(gender_know)
-sample = pd.DataFrame(expected)
-gender_know["Total"] = gender_know["<=11"] + gender_know[">11"]
-sums = gender_know.sum()
-gender_know.loc[len(gender_know)]= sums
-gender_know.index = ["Female","Male","Total"]
-st.subheader(":blue[Corsstab Gender & Knowledge Score, Observed Values]")
-st.table(gender_know)
-sample.index = ["Female","Male"]
-sample.columns = ["Score>=11","Score<11"]
-chi2 = str(chi2)
-st.subheader(":blue[Corsstab Gender & Knowledge Score, Expected Values]")
-st.table(sample)
-col1,col2,col3 = st.columns(3)
-col1.metric(label="Chi-Squre",value=chi2)
-#####################################3
-st.header(":green[Hypothesis 2] There Is No Difference between Male and Female Students With Regards to Knowledge on HPV")
-
-
-
