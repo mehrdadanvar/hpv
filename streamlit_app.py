@@ -305,7 +305,7 @@ col3.metric("degrees of freedom",str(round(gb_dof,3)))
 st.divider()
 ##########################################33
 st.subheader(":green[Hypothesis 5]")
-st.subheader("There Is No Difference Belivers and Non-Belivers With Regards to Missconceptions on HPV")
+st.subheader("Having Children Is Not Related to Missconceptions on HPV")
 def clean_child(row):
     ans = row["d_children"]
     category = ""
@@ -321,10 +321,10 @@ rb_sample = pd.DataFrame(rb_expected)
 chilbel["Total"] = chilbel["score>9"] + chilbel["score<=9"]
 rbsums = chilbel.sum()
 chilbel.loc[len(chilbel)]= rbsums
-chilbel.index = ["NoChild",">=1Child","Total"]
+chilbel.index = [">=1Child","NoChild","Total"]
 st.subheader(":blue[Corsstab Having Children & Belief Score (Observed)]")
 st.table(chilbel)
-rb_sample.index = ["NoChild",">=1Child"]
+rb_sample.index = [">=1Child","NoChild"]
 rb_sample.columns = ["score>9","score<=9"]
 rb_sample = rb_sample.reindex(columns=["score<=9","score>9"])
 st.subheader(":blue[Corsstab Having Children & Belief Score (Expected)]")
