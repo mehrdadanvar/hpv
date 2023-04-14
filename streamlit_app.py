@@ -221,8 +221,8 @@ ki_sample = pd.DataFrame(ki_expected)
 income_know["Total"] = income_know["score<=13"] + income_know["score>13"]
 sums = income_know.sum()
 income_know.loc[len(income_know)]= sums
-income_know.index = ["Female","Male","Total"]
-st.subheader(":blue[Corsstab Income & Knowledge Score (Observed)]")
+income_know.index = ["<$2000CAD",">=$2000CAD","Total"]
+st.subheader(":blue[Crosstab Income & Knowledge Score (Observed)]")
 st.table(income_know)
 ki_sample.index = ["<$2000CAD",">=$2000CAD"]
 ki_sample.columns = ["score<=13","score>13"]
@@ -291,17 +291,18 @@ gender_bel["Total"] = gender_bel["score>9"] + gender_bel["score<=9"]
 gbsums = gender_bel.sum()
 gender_bel.loc[len(gender_bel)]= gbsums
 gender_bel.index = ["Female","Male","Total"]
-st.subheader(":blue[Corsstab Gender & Belief Score, Observed Values]")
+st.subheader(":blue[Corsstab Gender & Belief Score (Observed)]")
 st.table(gender_bel)
 gb_sample.index = ["Female","Male"]
 gb_sample.columns = ["score>9","score<=9"]
 gb_sample = gb_sample.reindex(columns=["score<=9","score>9"])
-st.subheader(":blue[Corsstab Gender & Belief Score, Expected Values]")
+st.subheader(":blue[Corsstab Gender & Belief Score (Expected)]")
 st.table(gb_sample)
 col1,col2,col3 = st.columns(3)
 col1.metric(label="Chi-Squre",value=str(round(gb_chi2,3)))
 col2.metric("P_value",str(round(gb_p_value,3)))
 col3.metric("degrees of freedom",str(round(gb_dof,3)))
+st.write(":red[There is not enough evidence to reject the hypothesis!]")
 st.divider()
 ##########################################33
 st.subheader(":green[Hypothesis 5]")
