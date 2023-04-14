@@ -190,12 +190,12 @@ gender_know["Total"] = gender_know["score<=13"] + gender_know["score>13"]
 sums = gender_know.sum()
 gender_know.loc[len(gender_know)]= sums
 gender_know.index = ["Female","Male","Total"]
-st.subheader(":blue[Corsstab Gender & Knowledge Score (Observed)]")
+st.subheader(":blue[Crosstab Gender & Knowledge Score (Observed)]")
 st.table(gender_know)
 gk_sample.index = ["Female","Male"]
 gk_sample.columns = ["score<=13","score>13"]
 gk_sample = gk_sample.reindex(columns= ["score<=13","score>13"])
-st.subheader(":blue[Corsstab Gender & Knowledge Score (Expected)]")
+st.subheader(":blue[Crosstab Gender & Knowledge Score (Expected)]")
 st.table(gk_sample)
 col1,col2,col3 = st.columns(3)
 col1.metric(label="Chi-Squre",value=str(round(gk_chi2,3)))
@@ -227,7 +227,7 @@ st.table(income_know)
 ki_sample.index = ["<$2000CAD",">=$2000CAD"]
 ki_sample.columns = ["score<=13","score>13"]
 ki_sample = ki_sample.reindex(columns= ["score<=13","score>13"])
-st.subheader(":blue[Corsstab Income & Knowledge Score (Expected)]")
+st.subheader(":blue[Crosstab Income & Knowledge Score (Expected)]")
 st.table(ki_sample)
 col1,col2,col3 = st.columns(3)
 col1.metric(label="Chi-Squre",value=str(round(ki_chi2,3)))
@@ -255,12 +255,12 @@ marry_know["Total"] = marry_know["score<=13"] + marry_know["score>13"]
 sums = marry_know.sum()
 marry_know.loc[len(marry_know)]= sums
 marry_know.index = ["Involved","Single","Total"]
-st.subheader(":blue[Corsstab Marital Status & Knowledge Score(Observed)]")
+st.subheader(":blue[Crosstab Marital Status & Knowledge Score(Observed)]")
 st.table(marry_know)
 mksample.index = ["Involved","Single"]
 mksample.columns = ["score<=13","score>13"]
 mksample = mksample.reindex(columns=["score<=13","score>13"])
-st.subheader(":blue[Corsstab Marital Status & Knowledge Score (Expected)]")
+st.subheader(":blue[Crosstab Marital Status & Knowledge Score (Expected)]")
 st.table(mksample)
 col1,col2,col3 = st.columns(3)
 col1.metric(label="Chi-Squre",value=str(round(mk_chi2,3)))
@@ -291,12 +291,12 @@ gender_bel["Total"] = gender_bel["score>9"] + gender_bel["score<=9"]
 gbsums = gender_bel.sum()
 gender_bel.loc[len(gender_bel)]= gbsums
 gender_bel.index = ["Female","Male","Total"]
-st.subheader(":blue[Corsstab Gender & Belief Score (Observed)]")
+st.subheader(":blue[Crosstab Gender & Belief Score (Observed)]")
 st.table(gender_bel)
 gb_sample.index = ["Female","Male"]
 gb_sample.columns = ["score>9","score<=9"]
 gb_sample = gb_sample.reindex(columns=["score<=9","score>9"])
-st.subheader(":blue[Corsstab Gender & Belief Score (Expected)]")
+st.subheader(":blue[Crosstab Gender & Belief Score (Expected)]")
 st.table(gb_sample)
 col1,col2,col3 = st.columns(3)
 col1.metric(label="Chi-Squre",value=str(round(gb_chi2,3)))
@@ -323,12 +323,12 @@ chilbel["Total"] = chilbel["score>9"] + chilbel["score<=9"]
 rbsums = chilbel.sum()
 chilbel.loc[len(chilbel)]= rbsums
 chilbel.index = [">=1Child","NoChild","Total"]
-st.subheader(":blue[Corsstab Having Children & Belief Score (Observed)]")
+st.subheader(":blue[Crosstab Having Children & Belief Score (Observed)]")
 st.table(chilbel)
 rb_sample.index = [">=1Child","NoChild"]
 rb_sample.columns = ["score>9","score<=9"]
 rb_sample = rb_sample.reindex(columns=["score<=9","score>9"])
-st.subheader(":blue[Corsstab Having Children & Belief Score (Expected)]")
+st.subheader(":blue[Crosstab Having Children & Belief Score (Expected)]")
 st.table(rb_sample)
 col1,col2,col3 = st.columns(3)
 col1.metric(label="Chi-Squre",value=str(round(rb_chi2,3)))
